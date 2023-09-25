@@ -10,6 +10,8 @@
 #include "userinput.h"
 
 #define MAX_SIZE 100
+#define QUIT 0
+
 const char *IP = "127.0.0.1";
 
 void showTime(int sv_fd)
@@ -26,15 +28,24 @@ void showTime(int sv_fd)
     }
 }
 
+void receiveData(int sv_fd)
+{
+    char buffer[MAX_SIZE];
+    bzero(buffer, MAX_SIZE);
+    printf("Waiting...\n");
+    recv(sv_fd, buffer, sizeof(buffer), 0);
+    printf("From server: %s\n", buffer);
+}
+
 void main_menu()
 {
     printf("\n ------------------------------------ \n");
     printf("Welcome to the Secret Santa Project! \n");
     printf("Please enter an option from the list shown below: \n");
-    printf("'draw' for to begin pairing up with a giftee \n");
-    printf("'fetch' for printing out who your giftee is \n");
-    printf("'help' for more information \n");
-    printf("'0' to EXIT. \n");
+    printf("1. 'draw' for to begin pairing up with a giftee \n");
+    printf("2. 'fetch' for printing out who your giftee is \n");
+    printf("3. 'help' for more information \n");
+    printf("0. to EXIT. \n");
     printf("------------------------------------ \n");
 }
 
@@ -74,45 +85,67 @@ int main()
         printf("Bytes sent: %d\n", bytes_sent);
 
         char *cmd = malloc(10);
-        char *inputCmd = getLimitedLine(7);
-        printf("You typed %s", inputCmd);
-        if (strcasecmp(inputCmd, "draw") == 0)
-        {
-            printf("You triggered a draw!!\n");
-            strcpy(cmd, "1 ");
-            cmd[strlen(cmd + 1)] = '\0';
-            bytes_sent = send(sd, cmd, strlen(cmd) + 1, 0);
-            printf("Bytes sent: %d\n", bytes_sent);
-        }
-        else if (strcasecmp(inputCmd, "fetch") == 0)
-        {
-            printf("You triggered a fetch!!\n");
-            strcpy(cmd, "2 ");
-            cmd[strlen(cmd + 1)] = '\0';
-            bytes_sent = send(sd, cmd, strlen(cmd) + 1, 0);
-            printf("Bytes sent: %d\n", bytes_sent);
-        }
-
-        // while (1)
+        // char *inputCmd = getLimitedLine(7);
+        // printf("You typed %s", inputCmd);
+        // if (strcasecmp(inputCmd, "draw") == 0)
         // {
-
-        //     main_menu();
-        //     // scanf("%s", input);
-        //     input = getLimitedLine(20);
-
-        //     if (strcasecmp(input, "draw") == 0)
-        //     {
-        //         time_t currentTime = time(NULL);
-        //         char *time_msg = asctime(localtime(&currentTime));
-        //         printf("Sending time to client: %s \n", time_msg);
-        //         bytes_sent = send(sd, time_msg, strlen(time_msg), 0);
-        //         printf("Bytes sent: %d\n", bytes_sent);
-        //     }
+        //     printf("You triggered a draw!!\n");
+        //     strcpy(cmd, "1 ");
+        //     cmd[strlen(cmd + 1)] = '\0';
+        //     bytes_sent = send(sd, cmd, strlen(cmd) + 1, 0);
+        //     printf("Bytes sent: %d\n", bytes_sent);
         // }
+        // else if (strcasecmp(inputCmd, "fetch") == 0)
+        // {
+        //     printf("You triggered a fetch!!\n");
+        //     strcpy(cmd, "2 ");
+        //     cmd[strlen(cmd + 1)] = '\0';
+        //     bytes_sent = send(sd, cmd, strlen(cmd) + 1, 0);
+        //     printf("Bytes sent: %d\n", bytes_sent);
+        // }
+        int option = -1;
+
+        while (option != QUIT)
+        {
+            main_menu();
+            option = getPositiveInt();
+
+            if (option < 0)
+            {
+                printf("Your provided input is not valid. Please try again.");
+                continue;
+            }
+
+            switch (option)
+            {
+            case 0:
+                printf("Quitting...\n");
+                break;
+            case 1:
+                printf("You triggered a draw!!\n");
+                strcpy(cmd, "1 ");
+                cmd[strlen(cmd + 1)] = '\0';
+                bytes_sent = send(sd, cmd, strlen(cmd) + 1, 0);
+                printf("Bytes sent: %d\n", bytes_sent);
+
+                break;
+            case 2:
+                printf("You triggered a fetch!!\n");
+                strcpy(cmd, "2 ");
+                cmd[strlen(cmd + 1)] = '\0';
+                bytes_sent = send(sd, cmd, strlen(cmd) + 1, 0);
+                printf("Bytes sent: %d\n", bytes_sent);
+                receiveData(sd);
+                break;
+
+            default:
+                printf("Invalid option!\n");
+                break;
+            }
+        }
         free(input);
+        // showTime(sd);
+
+        close(sd);
     }
-
-    showTime(sd);
-
-    close(sd);
 }
