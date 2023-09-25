@@ -14,6 +14,7 @@
 #include <poll.h>
 
 #define PORT "4242" // Port we're listening on
+#define MAX_NUM_OF_CLIENTS 20
 
 // Get sockaddr, IPv4 or IPv6:
 void *get_in_addr(struct sockaddr *sa)
@@ -122,10 +123,10 @@ int main(void)
 
     char remoteIP[INET6_ADDRSTRLEN];
 
-    // Start off with room for 5 connections
+    // Start off with room for 20 connections
     // (We'll realloc as necessary)
     int fd_count = 0;
-    int fd_size = 5;
+    int fd_size = MAX_NUM_OF_CLIENTS;
     struct pollfd *pfds = malloc(sizeof *pfds * fd_size);
 
     // Set up and get a listening socket
@@ -146,6 +147,7 @@ int main(void)
     // Main loop
     for (;;)
     {
+        printf("Polling...\n");
         int poll_count = poll(pfds, fd_count, -1);
 
         if (poll_count == -1)
@@ -153,6 +155,8 @@ int main(void)
             perror("poll");
             exit(1);
         }
+
+        printf("Polled\n");
 
         // Run through the existing connections looking for data to read
         for (int i = 0; i < fd_count; i++)
@@ -190,9 +194,12 @@ int main(void)
                 else
                 {
                     // If not the listener, we're just a regular client
+                    printf("Server waiting...\n");
                     int nbytes = recv(pfds[i].fd, buf, sizeof buf, 0);
 
                     int sender_fd = pfds[i].fd;
+
+                    printf("Number of bytes received: %d \n", nbytes);
 
                     if (nbytes <= 0)
                     {
@@ -221,8 +228,16 @@ int main(void)
                             int dest_fd = pfds[j].fd;
 
                             // Except the listener and ourselves
-                            if (dest_fd != listener && dest_fd != sender_fd)
+                            // if (dest_fd != listener && dest_fd != sender_fd)
+                            // {
+                            //     if (send(dest_fd, buf, nbytes, 0) == -1)
+                            //     {
+                            //         perror("send");
+                            //     }
+                            // }
+                            if (dest_fd == sender_fd)
                             {
+                                printf("Sending back something\n.");
                                 if (send(dest_fd, buf, nbytes, 0) == -1)
                                 {
                                     perror("send");

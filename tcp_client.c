@@ -6,6 +6,7 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <unistd.h>
+#include <time.h>
 
 #define MAX_SIZE 100
 const char *IP = "127.0.0.1";
@@ -17,6 +18,7 @@ void showTime(int sv_fd)
     {
         bzero(buffer, MAX_SIZE);
         // printf("Connected.\n");
+        printf("Waiting...\n");
         recv(sv_fd, buffer, sizeof(buffer), 0);
         printf("From server: %s\n", buffer);
         printf("Waiting...\n");
@@ -25,7 +27,7 @@ void showTime(int sv_fd)
 
 int main()
 {
-    int ret, sd;
+    int ret, sd, bytes_sent;
     struct sockaddr_in sv_addr;
 
     sd = socket(AF_INET, SOCK_STREAM, 0);
@@ -45,6 +47,12 @@ int main()
     else
     {
         printf("Connected.\n");
+
+        time_t currentTime = time(NULL);
+        char *time_msg = asctime(localtime(&currentTime));
+        printf("Sending time to client: %s \n", time_msg);
+        bytes_sent = send(sd, time_msg, strlen(time_msg), 0);
+        printf("Bytes sent: %d\n", bytes_sent);
     }
 
     showTime(sd);
