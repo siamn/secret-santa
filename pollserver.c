@@ -202,6 +202,24 @@ void displayArr(int array[], int length)
     printf("]\n");
 }
 
+// fetch
+char *fetch(PList *list, int index)
+{
+    // char *name = list->arr[index].giftee;
+    // if (index != list->arr[index].connIndex)
+    // {
+    //     perror("Connection index not equal!");
+    // }
+    for (int i = 0; i < list->length; i++)
+    {
+        if (list->arr[i].connIndex == index)
+        {
+            return list->arr[i].giftee;
+        }
+    }
+    return NULL;
+}
+
 // Main
 int main(void)
 {
@@ -348,6 +366,27 @@ int main(void)
                             showParticipants(list);
                             break;
                         case '2': // 2 for fetch request from client
+
+                            for (int j = 0; j < fd_count; j++)
+                            {
+                                int dest_fd = pfds[j].fd;
+                                if (dest_fd == sender_fd)
+                                {
+                                    int index = j;
+                                    char *name = fetch(list, index);
+                                    if (name == NULL)
+                                    {
+                                        perror("Couldn't fetch giftee name! \n");
+                                        break;
+                                    }
+                                    printf("Sending %s", name);
+                                    printf("Sending back client's giftee name!\n.");
+                                    if (send(dest_fd, name, strlen(name), 0) == -1)
+                                    {
+                                        perror("send");
+                                    }
+                                }
+                            }
                             break;
                         default:
                             printf("Sorry invalid input\n");

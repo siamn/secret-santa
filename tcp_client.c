@@ -84,23 +84,31 @@ int main()
             bytes_sent = send(sd, cmd, strlen(cmd) + 1, 0);
             printf("Bytes sent: %d\n", bytes_sent);
         }
-
-        while (1)
+        else if (strcasecmp(inputCmd, "fetch") == 0)
         {
-
-            main_menu();
-            // scanf("%s", input);
-            input = getLimitedLine(20);
-
-            if (strcasecmp(input, "draw") == 0)
-            {
-                time_t currentTime = time(NULL);
-                char *time_msg = asctime(localtime(&currentTime));
-                printf("Sending time to client: %s \n", time_msg);
-                bytes_sent = send(sd, time_msg, strlen(time_msg), 0);
-                printf("Bytes sent: %d\n", bytes_sent);
-            }
+            printf("You triggered a fetch!!\n");
+            strcpy(cmd, "2 ");
+            cmd[strlen(cmd + 1)] = '\0';
+            bytes_sent = send(sd, cmd, strlen(cmd) + 1, 0);
+            printf("Bytes sent: %d\n", bytes_sent);
         }
+
+        // while (1)
+        // {
+
+        //     main_menu();
+        //     // scanf("%s", input);
+        //     input = getLimitedLine(20);
+
+        //     if (strcasecmp(input, "draw") == 0)
+        //     {
+        //         time_t currentTime = time(NULL);
+        //         char *time_msg = asctime(localtime(&currentTime));
+        //         printf("Sending time to client: %s \n", time_msg);
+        //         bytes_sent = send(sd, time_msg, strlen(time_msg), 0);
+        //         printf("Bytes sent: %d\n", bytes_sent);
+        //     }
+        // }
         free(input);
     }
 
