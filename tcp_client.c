@@ -61,10 +61,21 @@ int main()
     {
         printf("Connected.\n");
 
-        char *input;
+        char *name = malloc(50);
+        strcpy(name, "0 ");
+        printf("What's your name? \n");
+        // while loop for name validation (no numbers etc...)
+        char *input = getLimitedLine(47);
+        // num _ name /0
+        strlcat(name, input, 50);
+        name[strlen(name) + 1] = '\0';
+        printf("Sending name: %s\n", name);
+        bytes_sent = send(sd, name, strlen(name) + 1, 0);
+        printf("Bytes sent: %d\n", bytes_sent);
 
         while (1)
         {
+
             main_menu();
             // scanf("%s", input);
             input = getLimitedLine(20);

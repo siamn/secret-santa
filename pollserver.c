@@ -221,29 +221,40 @@ int main(void)
                     else
                     {
                         // We got some good data from a client
-
-                        for (int j = 0; j < fd_count; j++)
+                        // 0 Name
+                        // if 0 split on ' '
+                        // else
+                        // do draw (1) or fetch (2)
+                        if (buf[0] == '0')
                         {
-                            // Send to everyone!
-                            int dest_fd = pfds[j].fd;
-
-                            // Except the listener and ourselves
-                            // if (dest_fd != listener && dest_fd != sender_fd)
-                            // {
-                            //     if (send(dest_fd, buf, nbytes, 0) == -1)
-                            //     {
-                            //         perror("send");
-                            //     }
-                            // }
-                            if (dest_fd == sender_fd)
-                            {
-                                printf("Sending back something\n.");
-                                if (send(dest_fd, buf, nbytes, 0) == -1)
-                                {
-                                    perror("send");
-                                }
-                            }
+                            printf("Buffer: %s\n", buf);
+                            char *name = malloc(sizeof(char) * 20);
+                            strcpy(name, buf + 2);
+                            printf("Name: %s\n", name);
                         }
+
+                        // for (int j = 0; j < fd_count; j++)
+                        // {
+                        //     // Send to everyone!
+                        //     int dest_fd = pfds[j].fd;
+
+                        //     // Except the listener and ourselves
+                        //     // if (dest_fd != listener && dest_fd != sender_fd)
+                        //     // {
+                        //     //     if (send(dest_fd, buf, nbytes, 0) == -1)
+                        //     //     {
+                        //     //         perror("send");
+                        //     //     }
+                        //     // }
+                        //     if (dest_fd == sender_fd)
+                        //     {
+                        //         printf("Sending back something\n.");
+                        //         if (send(dest_fd, buf, nbytes, 0) == -1)
+                        //         {
+                        //             perror("send");
+                        //         }
+                        //     }
+                        // }
                     }
                 } // END handle data from client
             }     // END got ready-to-read from poll()
