@@ -73,6 +73,18 @@ int main()
         bytes_sent = send(sd, name, strlen(name) + 1, 0);
         printf("Bytes sent: %d\n", bytes_sent);
 
+        char *cmd = malloc(10);
+        char *inputCmd = getLimitedLine(7);
+        printf("You typed %s", inputCmd);
+        if (strcasecmp(inputCmd, "draw") == 0)
+        {
+            printf("You triggered a draw!!\n");
+            strcpy(cmd, "1 ");
+            cmd[strlen(cmd + 1)] = '\0';
+            bytes_sent = send(sd, cmd, strlen(cmd) + 1, 0);
+            printf("Bytes sent: %d\n", bytes_sent);
+        }
+
         while (1)
         {
 
