@@ -110,6 +110,37 @@ void del_from_pfds(struct pollfd pfds[], int i, int *fd_count)
     (*fd_count)--;
 }
 
+typedef struct Participant
+{
+    int connIndex; // index of connection for stored participant
+    char *name;
+    char *giftee;
+} P;
+
+typedef struct ParticipantsList
+{
+    P *arr;
+    int length;
+} PList;
+
+void addParticipant(PList *list, char *name, int index)
+{
+    printf("Participant added.\n");
+    list->arr[list->length].name = name;
+    list->arr[list->length].connIndex = index;
+    list->arr[list->length].giftee = NULL;
+    list->length++;
+};
+
+void showParticipants(PList *list)
+{
+    printf("Showing Participants: \n");
+    for (int i = 0; i < list->length; i++)
+    {
+        printf("%d %s %s\n", list->arr[i].connIndex, list->arr[i].name, list->arr[i].giftee);
+    }
+}
+
 // Main
 int main(void)
 {
@@ -121,6 +152,9 @@ int main(void)
 
     char buf[256]; // Buffer for client data
 
+    PList *list = (PList *)malloc(sizeof(PList)); // Array of structs storing client names and index
+    list->arr = (P *)malloc(sizeof(P) * MAX_NUM_OF_CLIENTS);
+    list->length = 0;
     char remoteIP[INET6_ADDRSTRLEN];
 
     // Start off with room for 20 connections
@@ -225,12 +259,29 @@ int main(void)
                         // if 0 split on ' '
                         // else
                         // do draw (1) or fetch (2)
-                        if (buf[0] == '0')
+                        char firstCharacter = buf[0];
+                        switch (firstCharacter)
                         {
+                        case '0': // 0 for input name from client
                             printf("Buffer: %s\n", buf);
                             char *name = malloc(sizeof(char) * 20);
                             strcpy(name, buf + 2);
                             printf("Name: %s\n", name);
+
+                            // P participant = {i, name, NULL};
+                            // printf("Participant after store: %s and index %d\n", participant.name, participant.connIndex);
+
+                            addParticipant(list, name, i);
+                            showParticipants(list);
+
+                            break;
+                        case '1': // 1 for draw request from client
+                            break;
+                        case '2': // 2 for fetch request from client
+                            break;
+                        default:
+                            printf("Sorry invalid input\n");
+                            break;
                         }
 
                         // for (int j = 0; j < fd_count; j++)
