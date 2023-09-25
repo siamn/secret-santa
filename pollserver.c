@@ -234,7 +234,10 @@ int main(void)
     PList *list = (PList *)malloc(sizeof(PList)); // Array of structs storing client names and index
     list->arr = (P *)malloc(sizeof(P) * MAX_NUM_OF_CLIENTS);
     list->length = 0;
+
     char remoteIP[INET6_ADDRSTRLEN];
+
+    int drawFlag = 0;
 
     // Start off with room for 20 connections
     // (We'll realloc as necessary)
@@ -260,7 +263,7 @@ int main(void)
     // Main loop
     for (;;)
     {
-        printf("Polling...\n");
+        // printf("Polling...\n");
         int poll_count = poll(pfds, fd_count, -1);
 
         if (poll_count == -1)
@@ -269,7 +272,7 @@ int main(void)
             exit(1);
         }
 
-        printf("Polled\n");
+        // printf("Polled\n");
 
         // Run through the existing connections looking for data to read
         for (int i = 0; i < fd_count; i++)
@@ -291,6 +294,12 @@ int main(void)
                     // If listener is ready to read, handle new connection
 
                     addrlen = sizeof remoteaddr;
+                    if (drawFlag)
+                    {
+                        printf("Draw has already happened. Preventing new connection!\n");
+                        // close(listener); // Bye!
+                        break;
+                    }
                     newfd = accept(listener,
                                    (struct sockaddr *)&remoteaddr,
                                    &addrlen);
@@ -301,6 +310,7 @@ int main(void)
                     }
                     else
                     {
+                        printf("Adding new connection...\n");
                         add_to_pfds(&pfds, newfd, &fd_count, &fd_size);
 
                         printf("pollserver: new connection from %s on "
@@ -361,11 +371,26 @@ int main(void)
                             showParticipants(list);
                             break;
                         case '1': // 1 for draw request from client
-                            printf("Drawing....\n");
-                            draw(list);
-                            showParticipants(list);
+                            if (!drawFlag)
+                            {
+                                printf("Drawing....\n");
+                                draw(list);
+                                showParticipants(list);
+                                close(listener); // Bye!
+                                drawFlag = 1;
+                            }
+                            else
+                            {
+                                // send back to client message
+                                printf("Draw has already happened. \n");
+                            }
                             break;
                         case '2': // 2 for fetch request from client
+                            if (!drawFlag)
+                            {
+                                printf("Draw has not happened yet. \n");
+                                break;
+                            }
 
                             for (int j = 0; j < fd_count; j++)
                             {
