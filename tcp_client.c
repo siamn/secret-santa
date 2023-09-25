@@ -7,6 +7,7 @@
 #include <netinet/in.h>
 #include <unistd.h>
 #include <time.h>
+#include "userinput.h"
 
 #define MAX_SIZE 100
 const char *IP = "127.0.0.1";
@@ -17,12 +18,24 @@ void showTime(int sv_fd)
     while (1)
     {
         bzero(buffer, MAX_SIZE);
-        // printf("Connected.\n");
+        printf("Connected.\n");
         printf("Waiting...\n");
         recv(sv_fd, buffer, sizeof(buffer), 0);
         printf("From server: %s\n", buffer);
         printf("Waiting...\n");
     }
+}
+
+void main_menu()
+{
+    printf("\n ------------------------------------ \n");
+    printf("Welcome to the Secret Santa Project! \n");
+    printf("Please enter an option from the list shown below: \n");
+    printf("'draw' for to begin pairing up with a giftee \n");
+    printf("'fetch' for printing out who your giftee is \n");
+    printf("'help' for more information \n");
+    printf("'0' to EXIT. \n");
+    printf("------------------------------------ \n");
 }
 
 int main()
@@ -48,11 +61,24 @@ int main()
     {
         printf("Connected.\n");
 
-        time_t currentTime = time(NULL);
-        char *time_msg = asctime(localtime(&currentTime));
-        printf("Sending time to client: %s \n", time_msg);
-        bytes_sent = send(sd, time_msg, strlen(time_msg), 0);
-        printf("Bytes sent: %d\n", bytes_sent);
+        char *input;
+
+        while (1)
+        {
+            main_menu();
+            // scanf("%s", input);
+            input = getLimitedLine(20);
+
+            if (strcasecmp(input, "draw") == 0)
+            {
+                time_t currentTime = time(NULL);
+                char *time_msg = asctime(localtime(&currentTime));
+                printf("Sending time to client: %s \n", time_msg);
+                bytes_sent = send(sd, time_msg, strlen(time_msg), 0);
+                printf("Bytes sent: %d\n", bytes_sent);
+            }
+        }
+        free(input);
     }
 
     showTime(sd);
