@@ -174,6 +174,17 @@ char *fetch(PList *list, int index)
     return NULL;
 }
 
+void freeMemory(PList *list)
+{
+    for (int i = 0; i < list->length; i++)
+    {
+        free(list->arr[i].name);
+        free(list->arr[i].giftee);
+    }
+    free(list->arr);
+    free(list);
+}
+
 /**
  * @brief Main Server Code
  *
@@ -219,6 +230,9 @@ int main(void)
     fd_count = 1; // For the listener
 
     // Main loop
+
+    // Would need to catch a signal for Ctrl-C for freeMemory function to ever be executed.
+
     while (1)
     {
         // printf("Polling...\n");
@@ -374,6 +388,8 @@ int main(void)
             }
         }
     }
+
+    freeMemory(list);
 
     return 0;
 }
