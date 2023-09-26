@@ -1,7 +1,3 @@
-/*
-** pollserver.c -- a cheezy multiperson chat server
-*/
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -38,7 +34,7 @@
 // }
 
 // Get sockaddr, IPv4 or IPv6:
-void *get_in_addr(struct sockaddr *sa)
+void *getInAddr(struct sockaddr *sa)
 {
     if (sa->sa_family == AF_INET)
     {
@@ -162,27 +158,19 @@ void showParticipants(PList *list)
     }
 }
 
-void shuffle(int arr[], int length);
-void displayArr(int arr[], int length);
-
-void draw(PList *list)
+int draw(PList *list)
 {
+    if (list->length <= 1)
+    {
+        return 1;
+    }
+
     // generate array of indexes
     int shuffleArr[list->length];
     for (int i = 0; i < list->length; i++)
     {
         shuffleArr[i] = i;
     }
-    // shuffle here
-    printf("Before:\n");
-    displayArr(shuffleArr, list->length);
-    shuffle(shuffleArr, list->length);
-    printf("After:\n");
-    displayArr(shuffleArr, list->length);
-    // assign giftees here
-    // 5 3 2
-    // 3 5 2
-    // 3
 
     for (int i = 0; i < list->length; i++)
     {
@@ -191,13 +179,11 @@ void draw(PList *list)
         int wrappedIndex = (i + 1 >= list->length) ? 0 : i + 1;
         int nextIndex = shuffleArr[wrappedIndex];
         P nextP = list->arr[nextIndex];
-        printf("Next name: %s\n", nextP.name);
-        // list->arr[currIndex].giftee = nextP.name;
         currP->giftee = nextP.name;
         printf("%s: %s\n", list->arr[currIndex].name, list->arr[currIndex].giftee);
     }
 
-    // showParticipants(list);
+    return 0;
 }
 
 void shuffle(int array[], int length)
@@ -212,24 +198,8 @@ void shuffle(int array[], int length)
     }
 }
 
-void displayArr(int array[], int length)
-{
-    printf("\n[");
-    for (int i = 0; i < length; i++)
-    {
-        printf("%d ", array[i]);
-    }
-    printf("]\n");
-}
-
-// fetch
 char *fetch(PList *list, int index)
 {
-    // char *name = list->arr[index].giftee;
-    // if (index != list->arr[index].connIndex)
-    // {
-    //     perror("Connection index not equal!");
-    // }
     for (int i = 0; i < list->length; i++)
     {
         if (list->arr[i].connIndex == index)
@@ -240,7 +210,6 @@ char *fetch(PList *list, int index)
     return NULL;
 }
 
-// Main
 int main(void)
 {
     int listener; // Listening socket descriptor
@@ -281,7 +250,7 @@ int main(void)
     fd_count = 1; // For the listener
 
     // Main loop
-    for (;;)
+    while (1)
     {
         // printf("Polling...\n");
         int poll_count = poll(pfds, fd_count, -1);
@@ -292,34 +261,22 @@ int main(void)
             exit(1);
         }
 
-        // printf("Polled\n");
-
         // Run through the existing connections looking for data to read
         for (int i = 0; i < fd_count; i++)
         {
-            /// 0 1 2 3 4 5
-            /// 4 3 1 0 2 5
-            /// 4->3
-            /// 3->1
-            /// 1->0
-            /// 2->5
-            /// 5->0
-
             // Check if someone's ready to read
             if (pfds[i].revents & POLLIN)
-            { // We got one!!
-
+            {
                 if (pfds[i].fd == listener)
                 {
                     // If listener is ready to read, handle new connection
-
-                    addrlen = sizeof remoteaddr;
                     if (drawFlag)
                     {
                         printf("Draw has already happened. Preventing new connection!\n");
-                        // close(listener); // Bye!
                         break;
                     }
+
+                    addrlen = sizeof remoteaddr;
                     newfd = accept(listener,
                                    (struct sockaddr *)&remoteaddr,
                                    &addrlen);
@@ -336,7 +293,7 @@ int main(void)
                         printf("pollserver: new connection from %s on "
                                "socket %d\n",
                                inet_ntop(remoteaddr.ss_family,
-                                         get_in_addr((struct sockaddr *)&remoteaddr),
+                                         getInAddr((struct sockaddr *)&remoteaddr),
                                          remoteIP, INET6_ADDRSTRLEN),
                                newfd);
                     }
@@ -346,7 +303,6 @@ int main(void)
                     // If not the listener, we're just a regular client
                     printf("Server waiting...\n");
                     int nbytes = recv(pfds[i].fd, buf, sizeof buf, 0);
-
                     int sender_fd = pfds[i].fd;
 
                     printf("Number of bytes received: %d \n", nbytes);
@@ -370,11 +326,6 @@ int main(void)
                     }
                     else
                     {
-                        // We got some good data from a client
-                        // 0 Name
-                        // if 0 split on ' '
-                        // else
-                        // do draw (1) or fetch (2)
                         char firstCharacter = buf[0];
                         switch (firstCharacter)
                         {
@@ -384,18 +335,26 @@ int main(void)
                             strcpy(name, buf + 2);
                             printf("Name: %s\n", name);
 
-                            // P participant = {i, name, NULL};
-                            // printf("Participant after store: %s and index %d\n", participant.name, participant.connIndex);
-
                             addParticipant(list, name, i);
                             showParticipants(list);
                             break;
                         case '1': // 1 for draw request from client
                             if (!drawFlag)
                             {
-                                printf("Drawing....\n");
-                                draw(list);
+                                int status = draw(list);
+                                if (status == 1)
+                                {
+                                    char status[2];
+                                    strcpy(status, "1");
+                                    send(sender_fd, status, strlen(status), 0);
+                                    break;
+                                }
+
+                                char statusBuf[2];
+                                strcpy(statusBuf, "0");
+                                send(sender_fd, statusBuf, strlen(statusBuf), 0);
                                 showParticipants(list);
+
                                 close(listener); // Bye!
                                 drawFlag = 1;
                             }
@@ -403,12 +362,18 @@ int main(void)
                             {
                                 // send back to client message
                                 printf("Draw has already happened. \n");
+                                char statusBuf[2];
+                                strcpy(statusBuf, "2");
+                                send(sender_fd, statusBuf, strlen(statusBuf), 0);
                             }
                             break;
                         case '2': // 2 for fetch request from client
                             if (!drawFlag)
                             {
                                 printf("Draw has not happened yet. \n");
+                                char status[2];
+                                strcpy(status, "3");
+                                send(sender_fd, status, strlen(status), 0);
                                 break;
                             }
 

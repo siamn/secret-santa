@@ -7,6 +7,6 @@
 #include <unistd.h>
 #include <string.h>
 
-void receiveData(int sv_fd);
+int receiveData(int sv_fd);
 
-void receiveLargeData(int sv_fd);
+int receiveLargeData(int sv_fd);
