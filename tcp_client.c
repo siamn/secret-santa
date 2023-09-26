@@ -14,27 +14,22 @@
 
 const char *IP = "127.0.0.1";
 
-void showTime(int sv_fd)
-{
-    char buffer[MAX_SIZE];
-    while (1)
-    {
-        bzero(buffer, MAX_SIZE);
-        printf("Connected.\n");
-        printf("Waiting...\n");
-        recv(sv_fd, buffer, sizeof(buffer), 0);
-        printf("From server: %s\n", buffer);
-        printf("Waiting...\n");
-    }
-}
-
-void receiveData(int sv_fd)
+int receiveData(int sv_fd)
 {
     char buffer[MAX_SIZE];
     bzero(buffer, MAX_SIZE);
-    printf("Waiting...\n");
     recv(sv_fd, buffer, sizeof(buffer), 0);
     printf("From server: %s\n", buffer);
+
+    if (strcasecmp(buffer, "1") == 0) { // error status received
+        return 1;
+    }
+
+    if (strcasecmp(buffer, "2") == 0) {
+        return 2;
+    }
+
+    return 0;
 }
 
 void main_menu()
@@ -82,7 +77,6 @@ int main()
         name[strlen(name) + 1] = '\0';
         printf("Sending name: %s\n", name);
         bytes_sent = send(sd, name, strlen(name) + 1, 0);
-        printf("Bytes sent: %d\n", bytes_sent);
 
         char *cmd = malloc(10);
         // char *inputCmd = getLimitedLine(7);
@@ -122,29 +116,40 @@ int main()
                 printf("Quitting...\n");
                 break;
             case 1:
-                printf("You triggered a draw!!\n");
+                printf("You selected the DRAW option.\n");
                 strcpy(cmd, "1 ");
                 cmd[strlen(cmd + 1)] = '\0';
                 bytes_sent = send(sd, cmd, strlen(cmd) + 1, 0);
-                printf("Bytes sent: %d\n", bytes_sent);
 
+                int statusDraw = receiveData(sd);
+                if (statusDraw == 1) {
+                    printf("Drawing was unsuccessful - one participant exists. \n");
+                    break;
+                }
+                else if (statusDraw) {
+                    printf("Draw has already occured! \n");
+                    break;
+                }
+
+                printf("Draw was successful! \n");
                 break;
             case 2:
-                printf("You triggered a fetch!!\n");
+                printf("You selected the FETCH option.\n");
                 strcpy(cmd, "2 ");
                 cmd[strlen(cmd + 1)] = '\0';
                 bytes_sent = send(sd, cmd, strlen(cmd) + 1, 0);
-                printf("Bytes sent: %d\n", bytes_sent);
-                receiveData(sd);
-                break;
 
+                int statusFetch = receiveData(sd);
+                if (statusFetch == 1) {
+                    printf("No participants to fetch. Draw has not taken place! \n");
+                }
+                break;
             default:
                 printf("Invalid option!\n");
                 break;
             }
         }
         free(input);
-        // showTime(sd);
 
         close(sd);
     }
