@@ -94,6 +94,16 @@ void printStatus(int sd, int status)
     }
 }
 
+void help() {
+    printf("You selected the HELP option.\n\n");
+    printf("Select 1. for the 'draw' function - only allowed when there are at least two participant names entered. \n");
+    printf("Draw occurs when any one of the participants calls this option, where each participant is assigned a giftee by random. \n");
+    printf("Subsequent draws are blocked and are notified of such a draw already happening. \n");
+    printf("\n");
+    printf("Select 2. for the 'fetch' function - only allowed when 'draw' has been called by one participant. \n");
+    printf("Fetch retrieves the giftee name that the user has been assigned, unique to each person. \n");
+}
+
 void main_menu()
 {
     printf("\n ------------------------------------ \n");
@@ -159,6 +169,9 @@ int main()
 
             int statusFetch = receiveLargeData(sd);
             printStatus(sd, statusFetch);
+            break;
+        case 3:
+            help();
             break;
         default:
             printf("Invalid option!\n");
