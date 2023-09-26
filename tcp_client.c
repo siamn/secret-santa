@@ -32,7 +32,7 @@ void sendName(int sd)
     printf("What's your name? \n");
     char *name = getLimitedLine(47);
     name[strlen(name) + 1] = '\0';
-    printf("Sending name: %s\n", name);
+    printf("You have entered name: %s\n", name);
     sendStr(name, sd);
 }
 

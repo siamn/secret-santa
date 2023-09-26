@@ -107,10 +107,9 @@ void sendStr(char *str, int fd)
     // Siam - 4
     sprintf(buf, "%lu ", strlen(str) + 2);
     strcat(buf, str);
-    printf("Sending (buf): %s", buf);
+    printf("Sending (buf): %s \n", buf);
 
-    printf("Sending (str) %s", str);
-    printf("Sending back client's giftee name!\n.");
+    printf("Sending (str) %s \n", str);
     if (send(fd, buf, sizeof buf, 0) == -1)
     {
         perror("send");
