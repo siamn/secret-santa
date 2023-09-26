@@ -324,9 +324,10 @@ int main(void)
                         {
                         default: // 0 for input name from client
                             printf("Buffer: %s\n", buf);
-                            char *name = malloc(sizeof(char) * 20);
-                            strcpy(name, buf + 2);
-                            printf("Name: %s\n", name);
+                            char *name = malloc(sizeof(char) * 50);
+
+                            parseLargeData(buf, name);
+                            printf("Got name: %s", name);
 
                             addParticipant(list, name, i);
                             showParticipants(list);

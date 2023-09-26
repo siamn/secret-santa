@@ -11,4 +11,6 @@ int receiveData(int sv_fd);
 
 int receiveLargeData(int sv_fd);
 
+int parseLargeData(char *buffer, char *save);
+
 void sendStr(char *str, int fd);
