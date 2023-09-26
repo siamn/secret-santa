@@ -29,14 +29,11 @@ int receiveData2(int sv_fd)
 
 void sendName(int sd)
 {
-    char *name = malloc(50);
-    strcpy(name, "0 ");
     printf("What's your name? \n");
-    char *input = getLimitedLine(47);
-    strlcat(name, input, 50);
+    char *name = getLimitedLine(47);
     name[strlen(name) + 1] = '\0';
     printf("Sending name: %s\n", name);
-    int bytes_sent = send(sd, name, strlen(name) + 1, 0);
+    sendStr(name, sd);
 }
 
 void sendCommand(int sd, int status)
@@ -49,14 +46,16 @@ void sendCommand(int sd, int status)
         printf("You selected the DRAW option.\n");
         strcpy(cmd, "D ");
         cmd[strlen(cmd + 1)] = '\0';
-        bytes_sent = send(sd, cmd, strlen(cmd) + 1, 0);
+        // bytes_sent = send(sd, cmd, strlen(cmd) + 1, 0);
+        sendall(sd, cmd, sizeof cmd);
     }
     else if (status == 2)
     {
         printf("You selected the FETCH option.\n");
         strcpy(cmd, "F ");
         cmd[strlen(cmd + 1)] = '\0';
-        bytes_sent = send(sd, cmd, strlen(cmd) + 1, 0);
+        // bytes_sent = send(sd, cmd, strlen(cmd) + 1, 0);
+        sendall(sd, cmd, sizeof cmd);
     }
 
     free(cmd);

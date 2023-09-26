@@ -41,20 +41,8 @@ int receiveData(int sv_fd)
     return checkForErrorCodes(buffer);
 }
 
-int receiveLargeData(int sv_fd)
+int parseLargeData(char *buffer, char *save)
 {
-    char buffer[MAX_SIZE];
-    bzero(buffer, MAX_SIZE);
-    // printf("Waiting...\n");
-    recv(sv_fd, buffer, sizeof(buffer), 0);
-
-    int res = checkForErrorCodes(buffer);
-    if (res)
-    {
-        printf("Errored early! %d\n", res);
-        return res; // there was an error, return the correct code
-    }
-
     char *s1;
     char *s2;
     char *sp;
@@ -84,8 +72,33 @@ int receiveLargeData(int sv_fd)
     }
     printf("Received: %s\n", data);
     // printf("Length of data: %lu\n", strlen(data) + 2);
+    if (save != NULL)
+    {
+        printf("Saving....\n");
+        strcpy(save, data);
+    }
+
+    free(s1);
+    free(data);
 
     return 0;
+}
+
+int receiveLargeData(int sv_fd)
+{
+    char buffer[MAX_SIZE];
+    bzero(buffer, MAX_SIZE);
+    // printf("Waiting...\n");
+    recv(sv_fd, buffer, sizeof(buffer), 0);
+
+    int res = checkForErrorCodes(buffer);
+    if (res)
+    {
+        printf("Errored early! %d\n", res);
+        return res; // there was an error, return the correct code
+    }
+
+    return parseLargeData(buffer, NULL);
 }
 
 void sendStr(char *str, int fd)
@@ -98,8 +111,30 @@ void sendStr(char *str, int fd)
 
     printf("Sending (str) %s", str);
     printf("Sending back client's giftee name!\n.");
-    if (send(fd, buf, strlen(buf), 0) == -1)
+    if (send(fd, buf, sizeof buf, 0) == -1)
     {
         perror("send");
     }
+}
+
+int sendall(int sd, char *buf, size_t len)
+{
+    int total = 0;       // how many bytes we've sent
+    int bytesleft = len; // how many we have left to send
+    int n;
+
+    while (total < len)
+    {
+        n = send(sd, buf + total, bytesleft, 0);
+        if (n == -1)
+        {
+            break;
+        }
+        total += n;
+        bytesleft -= n;
+    }
+
+    len = total; // return number actually sent here
+
+    return n == -1 ? -1 : 0; // return -1 on failure, 0 on success
 }

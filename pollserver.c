@@ -312,9 +312,10 @@ int main(void)
                         {
                         default: // 0 for input name from client
                             printf("Buffer: %s\n", buf);
-                            char *name = malloc(sizeof(char) * 20);
-                            strcpy(name, buf + 2);
-                            printf("Name: %s\n", name);
+                            char *name = malloc(sizeof(char) * 50);
+
+                            parseLargeData(buf, name);
+                            printf("Got name: %s", name);
 
                             addParticipant(list, name, i);
                             showParticipants(list);
@@ -327,13 +328,15 @@ int main(void)
                                 {
                                     char status[2];
                                     strcpy(status, "1");
-                                    send(sender_fd, status, strlen(status), 0);
+                                    // send(sender_fd, status, strlen(status), 0);
+                                    sendall(sender_fd, status, sizeof status);
                                     break;
                                 }
 
                                 char statusBuf[2];
                                 strcpy(statusBuf, "0");
-                                send(sender_fd, statusBuf, strlen(statusBuf), 0);
+                                // send(sender_fd, statusBuf, strlen(statusBuf), 0);
+                                sendall(sender_fd, statusBuf, sizeof statusBuf);
                                 showParticipants(list);
 
                                 close(listener); // Bye!
@@ -345,7 +348,8 @@ int main(void)
                                 printf("Draw has already happened. \n");
                                 char statusBuf[2];
                                 strcpy(statusBuf, "2");
-                                send(sender_fd, statusBuf, strlen(statusBuf), 0);
+                                // send(sender_fd, statusBuf, strlen(statusBuf), 0);
+                                sendall(sender_fd, statusBuf, sizeof statusBuf);
                             }
                             break;
                         case 'F': // 2 for fetch request from client
@@ -354,7 +358,8 @@ int main(void)
                                 printf("Draw has not happened yet. \n");
                                 char status[2];
                                 strcpy(status, "3");
-                                send(sender_fd, status, strlen(status), 0);
+                                // send(sender_fd, status, strlen(status), 0);
+                                sendall(sender_fd, status, sizeof status);
                                 break;
                             }
 
