@@ -2,7 +2,7 @@ CC = gcc
 
 all: server client
 
-server: pollserver.c participantstruct.h
+server: pollserver.c network.o participantstruct.h
 	$(CC) $^ -o server
 
 client: tcp_client.c userinput.o network.o

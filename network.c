@@ -87,3 +87,19 @@ int receiveLargeData(int sv_fd)
 
     return 0;
 }
+
+void sendStr(char *str, int fd)
+{
+    char buf[strlen(str) + 3];
+    // Siam - 4
+    sprintf(buf, "%lu ", strlen(str) + 2);
+    strcat(buf, str);
+    printf("Sending (buf): %s", buf);
+
+    printf("Sending (str) %s", str);
+    printf("Sending back client's giftee name!\n.");
+    if (send(fd, buf, strlen(buf), 0) == -1)
+    {
+        perror("send");
+    }
+}

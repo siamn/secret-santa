@@ -47,14 +47,14 @@ void sendCommand(int sd, int status)
     if (status == 1)
     {
         printf("You selected the DRAW option.\n");
-        strcpy(cmd, "1 ");
+        strcpy(cmd, "D ");
         cmd[strlen(cmd + 1)] = '\0';
         bytes_sent = send(sd, cmd, strlen(cmd) + 1, 0);
     }
     else if (status == 2)
     {
         printf("You selected the FETCH option.\n");
-        strcpy(cmd, "2 ");
+        strcpy(cmd, "F ");
         cmd[strlen(cmd + 1)] = '\0';
         bytes_sent = send(sd, cmd, strlen(cmd) + 1, 0);
     }
