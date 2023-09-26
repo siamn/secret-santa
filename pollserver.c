@@ -7,26 +7,6 @@
 #define PORT "4242" // Port we're listening on
 #define MAX_NUM_OF_CLIENTS 20
 
-// int recvall(int sd, char *buffer, size_t length)
-// {
-//     while (1)
-//     {
-//         recv(sd, buffer, length, 0);
-//         for (int i = 0; i < strlen(buffer); i++)
-//         {
-//             if (buffer[i] == '\n')
-//             {
-//                 if (i + 1 < length)
-//                 {
-//                     if (buffer[i + 1] == '\0')
-//                     {
-//                     }
-//                 }
-//             }
-//         }
-//     }
-// }
-
 // Get sockaddr, IPv4 or IPv6:
 void *getInAddr(struct sockaddr *sa)
 {
@@ -199,7 +179,7 @@ int main(void)
     struct sockaddr_storage remoteaddr; // Client address
     socklen_t addrlen;
 
-    char buf[256]; // Buffer for client data
+    char buf[MAX_BUF_SIZE]; // Buffer for client data
 
     PList *list = (PList *)malloc(sizeof(PList)); // Array of structs storing client names and index
     list->arr = (P *)malloc(sizeof(P) * MAX_NUM_OF_CLIENTS);
@@ -312,7 +292,7 @@ int main(void)
                         {
                         default: // 0 for input name from client
                             printf("Buffer: %s\n", buf);
-                            char *name = malloc(sizeof(char) * 50);
+                            char *name = malloc(MAX_STR_SIZE);
 
                             parseLargeData(buf, name);
                             printf("Got name: %s", name);

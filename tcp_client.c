@@ -2,35 +2,15 @@
 #include "userinput.h"
 #include "network.h"
 
-#define MAX_SIZE 100
+#define MAX_STR_LIMIT 50
 #define QUIT 0
 
 const char *IP = "127.0.0.1";
 
-int receiveData2(int sv_fd)
-{
-    char buffer[MAX_SIZE];
-    bzero(buffer, MAX_SIZE);
-    recv(sv_fd, buffer, sizeof(buffer), 0);
-    printf("From server: %s\n", buffer);
-
-    if (strcasecmp(buffer, "1") == 0)
-    { // 1 corresponding to an error status received
-        return 1;
-    }
-
-    if (strcasecmp(buffer, "2") == 0)
-    { // 2 corresponding to a draw already taking place
-        return 2;
-    }
-
-    return 0;
-}
-
 void sendName(int sd)
 {
     printf("What's your name? \n");
-    char *name = getLimitedLine(47);
+    char *name = getLimitedLine(MAX_STR_LIMIT);
     name[strlen(name) + 1] = '\0';
     printf("Sending name: %s\n", name);
     sendStr(name, sd);
@@ -38,7 +18,7 @@ void sendName(int sd)
 
 void sendCommand(int sd, int status)
 {
-    char *cmd = malloc(10);
+    char *cmd = malloc(MAX_CMD_SIZE);
     int bytes_sent;
 
     if (status == 1)

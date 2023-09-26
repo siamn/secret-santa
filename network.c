@@ -1,7 +1,5 @@
 #include "network.h"
 
-#define MAX_SIZE 100
-
 int checkForErrorCodes(char *buffer)
 {
     // Error Codes
@@ -32,8 +30,8 @@ int checkForErrorCodes(char *buffer)
 
 int receiveData(int sv_fd)
 {
-    char buffer[MAX_SIZE];
-    bzero(buffer, MAX_SIZE);
+    char buffer[MAX_CMD_SIZE];
+    bzero(buffer, MAX_CMD_SIZE);
     printf("Waiting...\n");
     recv(sv_fd, buffer, sizeof(buffer), 0);
     printf("From server: %s\n", buffer);
@@ -86,8 +84,8 @@ int parseLargeData(char *buffer, char *save)
 
 int receiveLargeData(int sv_fd)
 {
-    char buffer[MAX_SIZE];
-    bzero(buffer, MAX_SIZE);
+    char buffer[MAX_STR_SIZE];
+    bzero(buffer, MAX_STR_SIZE);
     // printf("Waiting...\n");
     recv(sv_fd, buffer, sizeof(buffer), 0);
 

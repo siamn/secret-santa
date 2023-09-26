@@ -7,6 +7,10 @@
 #include <unistd.h>
 #include <string.h>
 
+#define MAX_STR_SIZE 55
+#define MAX_CMD_SIZE 10
+#define MAX_BUF_SIZE 256
+
 int receiveData(int sv_fd);
 
 int receiveLargeData(int sv_fd);
