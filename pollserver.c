@@ -13,6 +13,26 @@
 #define PORT "4242" // Port we're listening on
 #define MAX_NUM_OF_CLIENTS 20
 
+// int recvall(int sd, char *buffer, size_t length)
+// {
+//     while (1)
+//     {
+//         recv(sd, buffer, length, 0);
+//         for (int i = 0; i < strlen(buffer); i++)
+//         {
+//             if (buffer[i] == '\n')
+//             {
+//                 if (i + 1 < length)
+//                 {
+//                     if (buffer[i + 1] == '\0')
+//                     {
+//                     }
+//                 }
+//             }
+//         }
+//     }
+// }
+
 // Get sockaddr, IPv4 or IPv6:
 void *getInAddr(struct sockaddr *sa)
 {
@@ -140,7 +160,8 @@ void showParticipants(PList *list)
 
 int draw(PList *list)
 {
-    if (list->length <= 1) {
+    if (list->length <= 1)
+    {
         return 1;
     }
 
@@ -199,7 +220,7 @@ int main(void)
 
     char buf[256]; // Buffer for client data
 
-    PList *list = (PList *) malloc(sizeof(PList)); // Array of structs storing client names and index
+    PList *list = (PList *)malloc(sizeof(PList)); // Array of structs storing client names and index
     list->arr = (P *)malloc(sizeof(P) * MAX_NUM_OF_CLIENTS);
     list->length = 0;
 
@@ -229,7 +250,7 @@ int main(void)
     fd_count = 1; // For the listener
 
     // Main loop
-    while(1)
+    while (1)
     {
         // printf("Polling...\n");
         int poll_count = poll(pfds, fd_count, -1);
@@ -245,7 +266,7 @@ int main(void)
         {
             // Check if someone's ready to read
             if (pfds[i].revents & POLLIN)
-            { 
+            {
                 if (pfds[i].fd == listener)
                 {
                     // If listener is ready to read, handle new connection
@@ -321,18 +342,19 @@ int main(void)
                             if (!drawFlag)
                             {
                                 int status = draw(list);
-                                if (status == 1) {
+                                if (status == 1)
+                                {
                                     char status[2];
                                     strcpy(status, "1");
                                     send(sender_fd, status, strlen(status), 0);
                                     break;
                                 }
-                                
+
                                 char statusBuf[2];
                                 strcpy(statusBuf, "0");
                                 send(sender_fd, statusBuf, strlen(statusBuf), 0);
                                 showParticipants(list);
-                                
+
                                 close(listener); // Bye!
                                 drawFlag = 1;
                             }
@@ -350,7 +372,7 @@ int main(void)
                             {
                                 printf("Draw has not happened yet. \n");
                                 char status[2];
-                                strcpy(status, "1");
+                                strcpy(status, "3");
                                 send(sender_fd, status, strlen(status), 0);
                                 break;
                             }
@@ -367,9 +389,15 @@ int main(void)
                                         perror("Couldn't fetch giftee name! \n");
                                         break;
                                     }
-                                    printf("Sending %s", name);
+                                    char buf[strlen(name) + 3];
+                                    // Siam - 4
+                                    sprintf(buf, "%lu ", strlen(name) + 2);
+                                    strcat(buf, name);
+                                    printf("Sending giftee name (buf): %s", buf);
+
+                                    printf("Sending (name) %s", name);
                                     printf("Sending back client's giftee name!\n.");
-                                    if (send(dest_fd, name, strlen(name), 0) == -1)
+                                    if (send(dest_fd, buf, strlen(buf), 0) == -1)
                                     {
                                         perror("send");
                                     }

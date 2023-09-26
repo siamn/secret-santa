@@ -1,38 +1,34 @@
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-#include <arpa/inet.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <unistd.h>
 #include <time.h>
 #include "userinput.h"
+#include "network.h"
 
 #define MAX_SIZE 100
 #define QUIT 0
 
 const char *IP = "127.0.0.1";
 
-int receiveData(int sv_fd)
+int receiveData2(int sv_fd)
 {
     char buffer[MAX_SIZE];
     bzero(buffer, MAX_SIZE);
     recv(sv_fd, buffer, sizeof(buffer), 0);
     printf("From server: %s\n", buffer);
 
-    if (strcasecmp(buffer, "1") == 0) { // 1 corresponding to an error status received
+    if (strcasecmp(buffer, "1") == 0)
+    { // 1 corresponding to an error status received
         return 1;
     }
 
-    if (strcasecmp(buffer, "2") == 0) { // 2 corresponding to a draw already taking place
+    if (strcasecmp(buffer, "2") == 0)
+    { // 2 corresponding to a draw already taking place
         return 2;
     }
 
     return 0;
 }
 
-void sendName(int sd) {
+void sendName(int sd)
+{
     char *name = malloc(50);
     strcpy(name, "0 ");
     printf("What's your name? \n");
@@ -43,17 +39,20 @@ void sendName(int sd) {
     int bytes_sent = send(sd, name, strlen(name) + 1, 0);
 }
 
-void sendCommand(int sd, int status) {
+void sendCommand(int sd, int status)
+{
     char *cmd = malloc(10);
     int bytes_sent;
 
-    if (status == 1) {
+    if (status == 1)
+    {
         printf("You selected the DRAW option.\n");
         strcpy(cmd, "1 ");
         cmd[strlen(cmd + 1)] = '\0';
         bytes_sent = send(sd, cmd, strlen(cmd) + 1, 0);
     }
-    else if (status == 2) {
+    else if (status == 2)
+    {
         printf("You selected the FETCH option.\n");
         strcpy(cmd, "2 ");
         cmd[strlen(cmd + 1)] = '\0';
@@ -63,23 +62,36 @@ void sendCommand(int sd, int status) {
     free(cmd);
 }
 
-void printDrawStatus(int sd, int status) {
-    if (status == 1) {
+void printStatus(int sd, int status)
+{
+    if (status == 1)
+    {
         printf("Drawing was unsuccessful - one participant exists. \n");
     }
-    else if (status == 2) {
+    else if (status == 2)
+    {
         printf("Draw has already occured! \n");
-    }else {
-        printf("Draw was successful! \n");
     }
-}
-
-void printFetchStatus(int sd, int status) {
-    if (status == 1) {
-        printf("No participants to fetch. Draw has not taken place! \n");
-        return;
+    else if (status == 3)
+    {
+        printf("Draw has not happened yet! \n");
     }
-    printf("Fetch was successful! \n");
+    else if (status == 4)
+    {
+        printf("(Error 405) Invalid data received. Please try again.\n");
+    }
+    else if (status == 5)
+    {
+        printf("(Error 406) Invalid data received. Please try again.\n");
+    }
+    else if (status == 6)
+    {
+        printf("(Error 407) Insufficient data received.\n");
+    }
+    else
+    {
+        printf("Operation was successful!\n");
+    }
 }
 
 void main_menu()
@@ -140,13 +152,13 @@ int main()
             sendCommand(sd, 1);
 
             int statusDraw = receiveData(sd);
-            printDrawStatus(sd, statusDraw);
+            printStatus(sd, statusDraw);
             break;
         case 2:
             sendCommand(sd, 2);
 
-            int statusFetch = receiveData(sd);
-            printFetchStatus(sd, statusFetch);
+            int statusFetch = receiveLargeData(sd);
+            printStatus(sd, statusFetch);
             break;
         default:
             printf("Invalid option!\n");
