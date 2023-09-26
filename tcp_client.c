@@ -1,41 +1,11 @@
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-#include <arpa/inet.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <unistd.h>
 #include <time.h>
 #include "userinput.h"
+#include "network.h"
 
 #define MAX_SIZE 100
 #define QUIT 0
 
 const char *IP = "127.0.0.1";
-
-void showTime(int sv_fd)
-{
-    char buffer[MAX_SIZE];
-    while (1)
-    {
-        bzero(buffer, MAX_SIZE);
-        printf("Connected.\n");
-        printf("Waiting...\n");
-        recv(sv_fd, buffer, sizeof(buffer), 0);
-        printf("From server: %s\n", buffer);
-        printf("Waiting...\n");
-    }
-}
-
-void receiveData(int sv_fd)
-{
-    char buffer[MAX_SIZE];
-    bzero(buffer, MAX_SIZE);
-    printf("Waiting...\n");
-    recv(sv_fd, buffer, sizeof(buffer), 0);
-    printf("From server: %s\n", buffer);
-}
 
 void main_menu()
 {
@@ -130,12 +100,12 @@ int main()
 
                 break;
             case 2:
-                printf("You triggered a fetch!!\n");
+                printf("You triggered a fetch!\n");
                 strcpy(cmd, "2 ");
                 cmd[strlen(cmd + 1)] = '\0';
                 bytes_sent = send(sd, cmd, strlen(cmd) + 1, 0);
                 printf("Bytes sent: %d\n", bytes_sent);
-                receiveData(sd);
+                receiveLargeData(sd);
                 break;
 
             default:

@@ -17,6 +17,26 @@
 #define PORT "4242" // Port we're listening on
 #define MAX_NUM_OF_CLIENTS 20
 
+// int recvall(int sd, char *buffer, size_t length)
+// {
+//     while (1)
+//     {
+//         recv(sd, buffer, length, 0);
+//         for (int i = 0; i < strlen(buffer); i++)
+//         {
+//             if (buffer[i] == '\n')
+//             {
+//                 if (i + 1 < length)
+//                 {
+//                     if (buffer[i + 1] == '\0')
+//                     {
+//                     }
+//                 }
+//             }
+//         }
+//     }
+// }
+
 // Get sockaddr, IPv4 or IPv6:
 void *get_in_addr(struct sockaddr *sa)
 {
@@ -404,9 +424,15 @@ int main(void)
                                         perror("Couldn't fetch giftee name! \n");
                                         break;
                                     }
-                                    printf("Sending %s", name);
+                                    char buf[strlen(name) + 3];
+                                    // Siam - 4
+                                    sprintf(buf, "%lu ", strlen(name) + 2);
+                                    strcat(buf, name);
+                                    printf("Sending giftee name (buf): %s", buf);
+
+                                    printf("Sending (name) %s", name);
                                     printf("Sending back client's giftee name!\n.");
-                                    if (send(dest_fd, name, strlen(name), 0) == -1)
+                                    if (send(dest_fd, buf, strlen(buf), 0) == -1)
                                     {
                                         perror("send");
                                     }
