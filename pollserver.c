@@ -9,6 +9,7 @@
 #include <netdb.h>
 #include <poll.h>
 #include <time.h>
+#include "participantstruct.h"
 
 #define PORT "4242" // Port we're listening on
 #define MAX_NUM_OF_CLIENTS 20
@@ -126,19 +127,6 @@ void del_from_pfds(struct pollfd pfds[], int i, int *fd_count)
 
     (*fd_count)--;
 }
-
-typedef struct Participant
-{
-    int connIndex; // index of connection for stored participant
-    char *name;
-    char *giftee;
-} P;
-
-typedef struct ParticipantsList
-{
-    P *arr;
-    int length;
-} PList;
 
 void addParticipant(PList *list, char *name, int index)
 {
