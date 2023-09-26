@@ -1,7 +1,3 @@
-/*
-** pollserver.c -- a cheezy multiperson chat server
-*/
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -18,7 +14,7 @@
 #define MAX_NUM_OF_CLIENTS 20
 
 // Get sockaddr, IPv4 or IPv6:
-void *get_in_addr(struct sockaddr *sa)
+void *getInAddr(struct sockaddr *sa)
 {
     if (sa->sa_family == AF_INET)
     {
@@ -142,9 +138,6 @@ void showParticipants(PList *list)
     }
 }
 
-void shuffle(int arr[], int length);
-void displayArr(int arr[], int length);
-
 int draw(PList *list)
 {
     if (list->length <= 1) {
@@ -184,17 +177,6 @@ void shuffle(int array[], int length)
     }
 }
 
-void displayArr(int array[], int length)
-{
-    printf("\n[");
-    for (int i = 0; i < length; i++)
-    {
-        printf("%d ", array[i]);
-    }
-    printf("]\n");
-}
-
-// fetch
 char *fetch(PList *list, int index)
 {
     for (int i = 0; i < list->length; i++)
@@ -207,7 +189,6 @@ char *fetch(PList *list, int index)
     return NULL;
 }
 
-// Main
 int main(void)
 {
     int listener; // Listening socket descriptor
@@ -248,7 +229,7 @@ int main(void)
     fd_count = 1; // For the listener
 
     // Main loop
-    for (;;)
+    while(1)
     {
         // printf("Polling...\n");
         int poll_count = poll(pfds, fd_count, -1);
@@ -259,25 +240,22 @@ int main(void)
             exit(1);
         }
 
-        // printf("Polled\n");
-
         // Run through the existing connections looking for data to read
         for (int i = 0; i < fd_count; i++)
         {
             // Check if someone's ready to read
             if (pfds[i].revents & POLLIN)
-            { // We got one!!
-
+            { 
                 if (pfds[i].fd == listener)
                 {
                     // If listener is ready to read, handle new connection
-                    addrlen = sizeof remoteaddr;
                     if (drawFlag)
                     {
                         printf("Draw has already happened. Preventing new connection!\n");
-                        // close(listener); // Bye!
                         break;
                     }
+
+                    addrlen = sizeof remoteaddr;
                     newfd = accept(listener,
                                    (struct sockaddr *)&remoteaddr,
                                    &addrlen);
@@ -294,7 +272,7 @@ int main(void)
                         printf("pollserver: new connection from %s on "
                                "socket %d\n",
                                inet_ntop(remoteaddr.ss_family,
-                                         get_in_addr((struct sockaddr *)&remoteaddr),
+                                         getInAddr((struct sockaddr *)&remoteaddr),
                                          remoteIP, INET6_ADDRSTRLEN),
                                newfd);
                     }
@@ -304,7 +282,6 @@ int main(void)
                     // If not the listener, we're just a regular client
                     printf("Server waiting...\n");
                     int nbytes = recv(pfds[i].fd, buf, sizeof buf, 0);
-
                     int sender_fd = pfds[i].fd;
 
                     printf("Number of bytes received: %d \n", nbytes);
@@ -328,11 +305,6 @@ int main(void)
                     }
                     else
                     {
-                        // We got some good data from a client
-                        // 0 Name
-                        // if 0 split on ' '
-                        // else
-                        // do draw (1) or fetch (2)
                         char firstCharacter = buf[0];
                         switch (firstCharacter)
                         {
