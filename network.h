@@ -10,3 +10,5 @@
 int receiveData(int sv_fd);
 
 int receiveLargeData(int sv_fd);
+
+void sendStr(char *str, int fd);

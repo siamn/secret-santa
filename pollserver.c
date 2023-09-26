@@ -1,14 +1,7 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
 #include <netdb.h>
 #include <poll.h>
 #include <time.h>
+#include "network.h"
 
 #define PORT "4242" // Port we're listening on
 #define MAX_NUM_OF_CLIENTS 20
@@ -329,7 +322,7 @@ int main(void)
                         char firstCharacter = buf[0];
                         switch (firstCharacter)
                         {
-                        case '0': // 0 for input name from client
+                        default: // 0 for input name from client
                             printf("Buffer: %s\n", buf);
                             char *name = malloc(sizeof(char) * 20);
                             strcpy(name, buf + 2);
@@ -338,7 +331,7 @@ int main(void)
                             addParticipant(list, name, i);
                             showParticipants(list);
                             break;
-                        case '1': // 1 for draw request from client
+                        case 'D': // 1 for draw request from client
                             if (!drawFlag)
                             {
                                 int status = draw(list);
@@ -367,7 +360,7 @@ int main(void)
                                 send(sender_fd, statusBuf, strlen(statusBuf), 0);
                             }
                             break;
-                        case '2': // 2 for fetch request from client
+                        case 'F': // 2 for fetch request from client
                             if (!drawFlag)
                             {
                                 printf("Draw has not happened yet. \n");
@@ -389,53 +382,17 @@ int main(void)
                                         perror("Couldn't fetch giftee name! \n");
                                         break;
                                     }
-                                    char buf[strlen(name) + 3];
-                                    // Siam - 4
-                                    sprintf(buf, "%lu ", strlen(name) + 2);
-                                    strcat(buf, name);
-                                    printf("Sending giftee name (buf): %s", buf);
 
-                                    printf("Sending (name) %s", name);
-                                    printf("Sending back client's giftee name!\n.");
-                                    if (send(dest_fd, buf, strlen(buf), 0) == -1)
-                                    {
-                                        perror("send");
-                                    }
+                                    sendStr(name, dest_fd);
                                 }
                             }
                             break;
-                        default:
-                            printf("Sorry invalid input\n");
-                            break;
                         }
-
-                        // for (int j = 0; j < fd_count; j++)
-                        // {
-                        //     // Send to everyone!
-                        //     int dest_fd = pfds[j].fd;
-
-                        //     // Except the listener and ourselves
-                        //     // if (dest_fd != listener && dest_fd != sender_fd)
-                        //     // {
-                        //     //     if (send(dest_fd, buf, nbytes, 0) == -1)
-                        //     //     {
-                        //     //         perror("send");
-                        //     //     }
-                        //     // }
-                        //     if (dest_fd == sender_fd)
-                        //     {
-                        //         printf("Sending back something\n.");
-                        //         if (send(dest_fd, buf, nbytes, 0) == -1)
-                        //         {
-                        //             perror("send");
-                        //         }
-                        //     }
-                        // }
                     }
-                } // END handle data from client
-            }     // END got ready-to-read from poll()
-        }         // END looping through file descriptors
-    }             // END for(;;)--and you thought it would never end!
+                }
+            }
+        }
+    }
 
     return 0;
 }
