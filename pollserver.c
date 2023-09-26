@@ -19,7 +19,7 @@ void *getInAddr(struct sockaddr *sa)
 }
 
 // Return a listening socket
-int get_listener_socket(void)
+int getListenerSocket(void)
 {
     int listener; // Listening socket descriptor
     int yes = 1;  // For setsockopt() SO_REUSEADDR, below
@@ -76,7 +76,7 @@ int get_listener_socket(void)
 }
 
 // Add a new file descriptor to the set
-void add_to_pfds(struct pollfd *pfds[], int newfd, int *fd_count, int *fd_size)
+void addToPfds(struct pollfd *pfds[], int newfd, int *fd_count, int *fd_size)
 {
     // If we don't have room, add more space in the pfds array
     if (*fd_count == *fd_size)
@@ -93,7 +93,7 @@ void add_to_pfds(struct pollfd *pfds[], int newfd, int *fd_count, int *fd_size)
 }
 
 // Remove an index from the set
-void del_from_pfds(struct pollfd pfds[], int i, int *fd_count)
+void delFromPfds(struct pollfd pfds[], int i, int *fd_count)
 {
     // Copy the one from the end over this one
     pfds[i] = pfds[*fd_count - 1];
@@ -171,6 +171,11 @@ char *fetch(PList *list, int index)
     return NULL;
 }
 
+/**
+ * @brief Main Server Code
+ *
+ * @ref Poll example used as starting base https://beej.us/guide/bgnet/html/index-wide.html#poll
+ */
 int main(void)
 {
     int listener; // Listening socket descriptor
@@ -196,7 +201,7 @@ int main(void)
     struct pollfd *pfds = malloc(sizeof *pfds * fd_size);
 
     // Set up and get a listening socket
-    listener = get_listener_socket();
+    listener = getListenerSocket();
 
     if (listener == -1)
     {
@@ -249,7 +254,7 @@ int main(void)
                     else
                     {
                         printf("Adding new connection...\n");
-                        add_to_pfds(&pfds, newfd, &fd_count, &fd_size);
+                        addToPfds(&pfds, newfd, &fd_count, &fd_size);
 
                         printf("pollserver: new connection from %s on "
                                "socket %d\n",
@@ -283,7 +288,7 @@ int main(void)
 
                         close(pfds[i].fd); // Bye!
 
-                        del_from_pfds(pfds, i, &fd_count);
+                        delFromPfds(pfds, i, &fd_count);
                     }
                     else
                     {
