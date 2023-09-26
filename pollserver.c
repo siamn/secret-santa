@@ -159,6 +159,9 @@ void shuffle(int array[], int length)
     }
 }
 
+// looping through as fds are currently deleted from pfds array
+// if connections are lost so cannot expect indexes to remain exactly the same
+// when indexing directly (rather than searching through loop)
 char *fetch(PList *list, int index)
 {
     for (int i = 0; i < list->length; i++)
