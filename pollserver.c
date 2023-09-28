@@ -133,6 +133,8 @@ int draw(PList *list)
         shuffleArr[i] = i;
     }
 
+    shuffle(shuffleArr, list->length);
+
     for (int i = 0; i < list->length; i++)
     {
         int currIndex = shuffleArr[i];
