@@ -45,36 +45,6 @@ char *getLimitedLine(int limit)
     return line;
 }
 
-// function should handle freeing memory itself (as only 1, 0 or -1 is returned (-1 for error))
-int getYesNoResponse(char *msg)
-{
-    char *input;
-    int response = 2;
-    while (response > 1)
-    {
-        printf("%s", msg);
-        printf("Please type 'yes'/'y'  or 'no'/'n' below:\n");
-        input = getLine();
-
-        if (strcmp(input, "yes") == 0 || strcmp(input, "y") == 0)
-        {
-            free(input); // free input as no longer needed.
-            return 1;
-        }
-        else if (strcmp(input, "no") == 0 || strcmp(input, "n") == 0)
-        {
-            free(input); // free input as no longer needed.
-            return 0;
-        }
-        else
-        {
-            printf("Please try again.\n");
-        }
-    }
-    free(input); // free input as no longer needed.
-    return -1;
-}
-
 // function should handle freeing memory itself as a parsed integer is returned rather than the string.
 int getPositiveInt()
 {
@@ -101,50 +71,4 @@ int getPositiveInt()
     }
     free(line); // have to free line as no longer being used after this function exits.
     return choice;
-}
-
-float getFloat()
-{
-    char *line = getLine();
-    char *end;
-    float num;
-    num = strtof(line, &end);
-    if (end == line)
-    {
-
-        if (errno == ERANGE)
-        {
-            printf("Input out of range\n");
-        }
-
-        printf("Please try again with a valid number.\n");
-        free(line); // have to free line as no longer being used after this function exits.
-        return -1.0;
-    }
-    free(line);
-
-    // printf("Float: %.2f\n", num);
-    return num;
-}
-
-float getBoundPositiveFloat(int lowerBound, int upperBound)
-{
-    float num = -1.0;
-    while (num == -1.0 || (num < lowerBound || num > upperBound))
-    {
-        num = getFloat();
-        if (num == -1.0)
-        {
-            printf("Try again: \n");
-        }
-        else if (num < lowerBound)
-        {
-            printf("Input is too low. Try again:\n");
-        }
-        else if (num > upperBound)
-        {
-            printf("Input is too high. Try again:\n");
-        }
-    }
-    return num;
 }

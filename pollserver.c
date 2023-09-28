@@ -5,7 +5,7 @@
 #include "participantstruct.h"
 
 #define PORT "4242" // Port we're listening on
-#define MAX_NUM_OF_CLIENTS 20
+#define MAX_NUM_OF_CLIENTS 3
 
 // Get sockaddr, IPv4 or IPv6:
 void *getInAddr(struct sockaddr *sa)
@@ -313,14 +313,32 @@ int main(void)
                         switch (firstCharacter)
                         {
                         default: // 0 for input name from client
-                            printf("Buffer: %s\n", buf);
-                            char *name = malloc(MAX_STR_SIZE);
+                            if (drawFlag)
+                            {
+                                printf("The draw has already been performed. Preventing registration.\n");
+                            }
+                            if (list->length < MAX_NUM_OF_CLIENTS)
+                            {
+                                printf("Buffer: %s\n", buf);
+                                char *name = malloc(MAX_STR_SIZE);
 
-                            parseLargeData(buf, name);
-                            printf("Got name: %s", name);
+                                parseLargeData(buf, name);
+                                printf("Got name: %s", name);
 
-                            addParticipant(list, name, i);
-                            showParticipants(list);
+                                addParticipant(list, name, i);
+
+                                if (list->length >= MAX_NUM_OF_CLIENTS)
+                                {
+                                    printf("Closing listener socket to prevent incoming connections.\n");
+                                    close(listener);
+                                }
+
+                                showParticipants(list);
+                            }
+                            else
+                            {
+                                printf("Max number of participants reached. Preventing registration.\n");
+                            }
                             break;
                         case 'D': // 1 for draw request from client
                             if (!drawFlag)

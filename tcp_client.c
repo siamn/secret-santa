@@ -57,15 +57,15 @@ void printStatus(int sd, int status)
     }
     else if (status == 4)
     {
-        printf("(Error 405) Invalid data received. Please try again.\n");
+        printf("(Error 404) Invalid data received. Please try again.\n");
     }
     else if (status == 5)
     {
-        printf("(Error 406) Invalid data received. Please try again.\n");
+        printf("(Error 405) Invalid data received. Please try again.\n");
     }
     else if (status == 6)
     {
-        printf("(Error 407) Insufficient data received.\n");
+        printf("(Error 406) Insufficient data received.\n");
     }
     else
     {
@@ -73,7 +73,8 @@ void printStatus(int sd, int status)
     }
 }
 
-void help() {
+void help()
+{
     printf("You selected the HELP option.\n\n");
     printf("Select 1. for the 'draw' function - only allowed when there are at least two participant names entered. \n");
     printf("Draw occurs when any one of the participants calls this option, where each participant is assigned a giftee by random. \n");

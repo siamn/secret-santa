@@ -101,8 +101,13 @@ int receiveLargeData(int sv_fd)
 
 void sendStr(char *str, int fd)
 {
-    char buf[strlen(str) + 3];
-    // Siam - 4
+    char buf[strlen(str) + 5]; // add extra space for length of string (int) + space + null terminator
+
+    // the length stored represents the length of the string after itself ( i.e. the string length + space + nul
+    // terminator). e.g. '6 Name' would be an example message as length of "Name" is 4, and space and null terminator
+    // are two bytes so the length of the message is 6 bytes (not including the characters representing the length).
+
+    // on the receiving end, when parsing, the length is split from the message itself by using the space as a delimiter
     sprintf(buf, "%lu ", strlen(str) + 2);
     strcat(buf, str);
     printf("Sending (buf): %s \n", buf);

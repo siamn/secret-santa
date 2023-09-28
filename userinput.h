@@ -17,34 +17,8 @@ char *getLine();
 char *getLimitedLine(int limit);
 
 /**
- * @brief Get user input for a yes / no response after displaying
- * the prompt passed in as argument.
- *
- * @param prompt Message to display to the user.
- * @return int
- */
-int getYesNoResponse(char *prompt);
-
-/**
  * @brief Get user input for a positive integer.
  *
  * @return int
  */
 int getPositiveInt();
-
-/**
- * @brief Get user input for a float
- *
- * @return float Returns -1.0 if an error occurs
- */
-float getFloat();
-
-/**
- * @brief Get user input for a positive float bounded between lowerBound
- * and upperBound. Repeatedly asks for input until this is satisfied.
- *
- * @param lowerBound
- * @param upperBound
- * @return float
- */
-float getBoundPositiveFloat(int lowerBound, int upperBound);
