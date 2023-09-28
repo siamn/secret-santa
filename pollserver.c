@@ -119,6 +119,18 @@ void showParticipants(PList *list)
     }
 }
 
+void shuffle(int array[], int length)
+{
+    srand(time(NULL));
+    for (int i = 0; i < length; i++)
+    {
+        int swap_index = rand() % length;
+        int temp = array[i];
+        array[i] = array[swap_index];
+        array[swap_index] = temp;
+    }
+}
+
 int draw(PList *list)
 {
     if (list->length <= 1)
@@ -147,18 +159,6 @@ int draw(PList *list)
     }
 
     return 0;
-}
-
-void shuffle(int array[], int length)
-{
-    srand(time(NULL));
-    for (int i = 0; i < length; i++)
-    {
-        int swap_index = rand() % length;
-        int temp = array[i];
-        array[i] = array[swap_index];
-        array[swap_index] = temp;
-    }
 }
 
 // looping through as fds are currently deleted from pfds array
