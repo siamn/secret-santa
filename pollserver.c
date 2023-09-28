@@ -332,7 +332,7 @@ int main(void)
                                 char *name = malloc(MAX_STR_SIZE);
 
                                 parseLargeData(buf, name);
-                                printf("Got name: %s", name);
+                                printf("Received name: %s\n", name);
 
                                 addParticipant(list, name, i);
 
