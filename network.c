@@ -10,6 +10,10 @@ int checkForErrorCodes(char *buffer)
     // For fetch:
     // 3 = Draw has not happened yet
     //
+
+    // For register:
+    // 7 - draw occured, preventing registration
+    // 8 - max participants reached, preventing registration.
     if (strcasecmp(buffer, "1") == 0)
     { // 1 corresponding to an error status received
         return 1;
@@ -23,6 +27,16 @@ int checkForErrorCodes(char *buffer)
     else if (strcasecmp(buffer, "3") == 0)
     {
         return 3;
+    }
+
+    else if (strcasecmp(buffer, "7") == 0)
+    {
+        return 7;
+    }
+
+    else if (strcasecmp(buffer, "8") == 0)
+    {
+        return 8;
     }
 
     return 0;

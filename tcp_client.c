@@ -67,6 +67,14 @@ void printStatus(int sd, int status)
     {
         printf("(Error 406) Insufficient data received.\n");
     }
+    else if (status == 7)
+    {
+        printf("The draw has already been performed. Preventing registration. Please try again next time :)\n");
+    }
+    else if (status == 8)
+    {
+        printf("Max number of participants reached. We could not register you.\n Please try again next time :) \n");
+    }
     else
     {
         printf("Operation was successful!\n");
@@ -119,6 +127,13 @@ int main()
     printf("Connected.\n");
 
     sendName(sd);
+    int statusRegister = receiveData(sd);
+    printf("Registration status: %d\n", statusRegister);
+    printStatus(sd, statusRegister);
+    if (statusRegister != 0)
+    {
+        exit(0);
+    }
 
     int option = -1;
 

@@ -5,7 +5,7 @@
 #include "participantstruct.h"
 
 #define PORT "4242" // Port we're listening on
-#define MAX_NUM_OF_CLIENTS 3
+#define MAX_NUM_OF_CLIENTS 20
 
 // Get sockaddr, IPv4 or IPv6:
 void *getInAddr(struct sockaddr *sa)
@@ -316,6 +316,15 @@ int main(void)
                             if (drawFlag)
                             {
                                 printf("The draw has already been performed. Preventing registration.\n");
+
+                                char status[2];
+                                strcpy(status, "7");
+                                // send(sender_fd, status, strlen(status), 0);
+                                sendall(sender_fd, status, sizeof status);
+
+                                close(pfds[i].fd);
+                                delFromPfds(pfds, i, &fd_count);
+                                break;
                             }
                             if (list->length < MAX_NUM_OF_CLIENTS)
                             {
@@ -333,11 +342,24 @@ int main(void)
                                     close(listener);
                                 }
 
+                                char status[2];
+                                strcpy(status, "0");
+                                // send(sender_fd, status, strlen(status), 0);
+                                sendall(sender_fd, status, sizeof status);
+
                                 showParticipants(list);
                             }
                             else
                             {
                                 printf("Max number of participants reached. Preventing registration.\n");
+
+                                char status[2];
+                                strcpy(status, "8");
+                                // send(sender_fd, status, strlen(status), 0);
+                                sendall(sender_fd, status, sizeof status);
+
+                                close(pfds[i].fd);
+                                delFromPfds(pfds, i, &fd_count);
                             }
                             break;
                         case 'D': // 1 for draw request from client
